@@ -24,8 +24,8 @@ public function getById(int $id): array {
       $stmt = $this->db->prepare("SELECT id, username, email FROM users WHERE id = :id");
       $stmt->bindParam(':id', $id, PDO::PARAM_INT);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_ASSOC);
-
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $result !== false ? $result : [];
     } catch (Throwable $e) {
     //maybe use that
     throw new UserError('Failed to fetch User by ID: ' . $e->getMessage());

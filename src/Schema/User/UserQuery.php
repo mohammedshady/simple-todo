@@ -16,11 +16,17 @@ class UserQuery {
                 },
             ],
             'user' => [
-                'type' => Types::user(),
+                'type' => Types::userResult(),
                 'args' => ['id' => Type::nonNull(Type::int())],
-                'resolve' => static function ($root, array $args): array {
+                'resolve' => static function ($root, array $args) {
                     $userModel = new UserModel();
-                    return $userModel->getById($args['id']);
+                    $result = $userModel->getById($args['id']);
+
+                    if (empty($result)) {
+                        return ['message' => 'User not found', 'code' => 'NOT_FOUND'];
+                    } else {
+                        return $result;
+                    }
                 },
             ],
         ];

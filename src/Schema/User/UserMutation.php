@@ -23,7 +23,36 @@ class UserMutation {
                     return $result ? $userModel->getById($userModel->getLastInsertId()) : null;
                 },
             ],
-            // You can add more mutations here, like updateUser, deleteUser, etc.
+            'deleteUser' => [
+                'type' => Type::boolean(),
+                'args' => [
+                    'id' => Type::nonNull(Type::int()),
+                ],
+                'resolve' => static function ($root, array $args): bool {
+                    $userModel = new UserModel();
+                    return $userModel->delete($args['id']);
+                },
+            ],
+            'updateUser' => [
+                'type' => Types::user(),
+                'args' => [
+                    'id' => Type::nonNull(Type::int()),
+                    'username' => Type::nonNull(Type::string()),
+                    'email' => Type::nonNull(Type::string()),
+                ],
+                'resolve' => static function ($root, array $args): array {
+                    $userModel = new UserModel();
+                    $result = $userModel->update([
+                        'id' => $args['id'],
+                        'username' => $args['username'],
+                        'email' => $args['email']
+                    ]);
+                    if ($result) {
+                        return $userModel->getById($args['id']);
+                    }
+                    return null;
+                },
+            ],
         ];
     }
 }

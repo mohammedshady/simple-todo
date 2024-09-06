@@ -23,7 +23,36 @@ class TodoMutation {
                     return $result ? $todoModel->getById($todoModel->getLastInsertId()) : null;
                 },
             ],
-            // You can add more mutations here, like updateTodo, deleteTodo, etc.
+            'updateTodo' => [
+                'type' =>  Types::todo(),
+                'args' => [
+                    'id' => Type::nonNull(Type::int()),
+                    'title' => Type::nonNull(Type::string()),
+                    'completed' => Type::nonNull(Type::boolean()),
+                ],
+                'resolve' => static function ($root, array $args): ?array {
+                    $todoModel = new TodoModel();
+                    $result = $todoModel->update([
+                        'id' => $args['id'],
+                        'title' => $args['title'],
+                        'completed' => $args['completed']
+                    ]);
+                    if ($result) {
+                        return $todoModel->getById($args['id']);
+                    }
+                    return null;
+                },
+            ],
+            'deleteTodo' => [
+                'type' => Type::boolean(),
+                'args' => [
+                    'id' => Type::nonNull(Type::int()),
+                ],
+                'resolve' => static function ($root, array $args): bool {
+                    $todoModel = new TodoModel();
+                    return $todoModel->delete($args['id']);
+                },
+            ],
         ];
     }
 }

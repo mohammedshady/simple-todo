@@ -18,22 +18,22 @@ class GraphQL {
         try {
             $queryType = new ObjectType([
                 'name' => 'Query',
-                'fields' => function() {
-                    return array_merge(
+                'fields' => 
+                    array_merge(
                         UserQuery::fields(),
                         TodoQuery::fields()
-                    );
-                }
+                    )
             ]);
+
             $mutationType = new ObjectType([
                 'name' => 'Mutation',
-                'fields' => function() {
-                    return array_merge(
+                'fields' =>
+                    array_merge(
                         UserMutation::fields(),
                         TodoMutation::fields()
-                    );
-                }
+                    )
             ]);
+            
             $schema = new Schema(
                 (new SchemaConfig())
                     ->setQuery($queryType)
