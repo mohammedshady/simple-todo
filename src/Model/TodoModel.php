@@ -12,18 +12,20 @@ class TodoModel extends Entity {
 
         try {
             $stmt = $this->db->query("SELECT * FROM todos");
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $result !== false ? $result : [];
         } catch (Throwable $e) {
-            throw new RuntimeException('Failed to fetch all todos: ' . $e->getMessage());
+            //maybe use that
+            throw new UserError('Failed to fetch Todos ' . $e->getMessage());
         }
     }
-
     public function getById(int $id): array {
         try {
             $stmt = $this->db->prepare("SELECT id, title, completed FROM todos WHERE id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result !== false ? $result : [];
         } catch (Throwable $e) {
             throw new RuntimeException('Failed to fetch todo by ID: ' . $e->getMessage());
         }

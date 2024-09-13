@@ -16,9 +16,9 @@ class UserQuery {
                 },
             ],
             'user' => [
-                'type' => Types::userResult(),
+                'type' => Types::result(Types::user()),
                 'args' => ['id' => Type::nonNull(Type::int())],
-                'resolve' => static function ($root, array $args) {
+                'resolve' => static function ($root, array $args): array {
                     $userModel = new UserModel();
                     $result = $userModel->getById($args['id']);
 

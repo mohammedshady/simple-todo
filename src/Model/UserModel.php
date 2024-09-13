@@ -13,9 +13,11 @@ class UserModel extends Entity {
 public function getAll(): array {
     try {
         $stmt = $this->db->query("SELECT * FROM users");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result !== false ? $result : [];
     } catch (Throwable $e) {
-        throw new RuntimeException('Failed to fetch all users: ' . $e->getMessage());
+        //maybe use that
+        throw new UserError('Failed to fetch Users ' . $e->getMessage());
     }
 }
 

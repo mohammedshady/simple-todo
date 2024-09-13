@@ -3,7 +3,7 @@ namespace App\Schema;
 
 use App\Schema\User\UserType;
 use App\Schema\Todo\TodoType;
-use App\Schema\NotFound\NotFoundType;
+use App\Schema\Error\ErrorType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
 
@@ -11,8 +11,10 @@ class Types
 {
     private static $todoType;
     private static $userType;
-    private static $notFoundType;
-    private static $userResultType;
+    private static $errorType;
+    private static $resultType;
+    private static $listResultType;
+
 
     public static function todo()
     {
@@ -28,23 +30,23 @@ class Types
         }));
     }
 
-    public static function notFound()
+    public static function error()
     {
-        return self::$notFoundType ?: (self::$notFoundType = NotFoundType::type());
+        return self::$errorType ?: (self::$errorType = ErrorType::type());
     }
 
-    public static function userResult()
+    public static function result($type)
     {
-        return self::$userResultType ?: (self::$userResultType = new UnionType([
-            'name' => 'UserResultType',
-            'types' => [self::user(), self::notFound()],
-            'resolveType' => function ($root) {
+        return (self::$resultType = new UnionType([
+            'name' => $type->name.'ResultType',
+            'types' => [$type, self::error()],
+            'resolveType' => function ($root) use ($type) {
                 //to be changed
                 if (isset($root['code'])) {
-                    return self::notFound();
+                    return self::error();
                 }
                 else {
-                    return self::user();
+                    return $type;
                 }
             }
         ]));

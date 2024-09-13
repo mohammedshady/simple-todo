@@ -1,13 +1,13 @@
 <?php
-namespace App\Schema\NotFound;
+namespace App\Schema\Error;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-class NotFoundType {
+class ErrorType {
     public static function type() {
         return new ObjectType([
-            'name' => 'NotFound',
+            'name' => 'Error',
             'fields' => function() {
                 return [
                 'code' => ['type' => Type::string()],
