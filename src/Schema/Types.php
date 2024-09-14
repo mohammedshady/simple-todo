@@ -2,10 +2,12 @@
 namespace App\Schema;
 
 use App\Schema\User\UserType;
+use App\Schema\List\ListType;
 use App\Schema\Todo\TodoType;
 use App\Schema\Error\ErrorType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\UnionType;
+use GraphQL\Type\Definition\ObjectType;
 
 class Types
 {
@@ -13,7 +15,7 @@ class Types
     private static $userType;
     private static $errorType;
     private static $resultType;
-    private static $listResultType;
+    private static $listType;
 
 
     public static function todo()
@@ -34,21 +36,27 @@ class Types
     {
         return self::$errorType ?: (self::$errorType = ErrorType::type());
     }
+    public static function list($type)
+    {
+        $typeName = $type->name;
+        return new ObjectType([
+            'name' => "{$typeName}List",
+            'fields' => [
+                'list' => ['type' => Type::listOf($type)],
+            ]
+        ]);
+    }
 
     public static function result($type)
-    {
-        return (self::$resultType = new UnionType([
-            'name' => $type->name.'ResultType',
+    {   
+        $typeName = $type->name;
+        return new UnionType([
+            'name' => "{$typeName}Result",
             'types' => [$type, self::error()],
             'resolveType' => function ($root) use ($type) {
-                //to be changed
-                if (isset($root['code'])) {
-                    return self::error();
-                }
-                else {
-                    return $type;
-                }
+                return isset($root['code']) ? self::error() : $type;
             }
-        ]));
+        ]);
     }
+
 }

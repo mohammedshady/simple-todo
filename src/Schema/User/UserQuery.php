@@ -9,10 +9,15 @@ class UserQuery {
     public static function fields() {
         return [
             'users' => [
-                'type' => Type::listOf(Types::user()),
+                'type' => Types::result(Types::list(Types::user())),
                 'resolve' => static function (): array {
                     $userModel = new UserModel();
-                    return $userModel->getAll();
+                    $result = $userModel->getAll();
+                    if (empty($result)) {
+                        return ['message' => 'Users not found', 'code' => 'NOT_FOUND'];
+                    } else {
+                        return ['list' => $result]; 
+                    }
                 },
             ],
             'user' => [

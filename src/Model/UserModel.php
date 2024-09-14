@@ -80,7 +80,8 @@ public function getUserTodos(int $userId): array
         ");
         $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result !== false ? $result : [];
     } catch (Throwable $e) {
         throw new RuntimeException('Failed to fetch user todos: ' . $e->getMessage());
     }

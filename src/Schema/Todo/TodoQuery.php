@@ -8,13 +8,18 @@ use App\Schema\Types;
 class TodoQuery {
     public static function fields() {
         return [
-            'todos' => [
-                'type' => Type::listOf(Types::todo()),
-                'resolve' => static function (): array {
-                    $todoModel = new TodoModel();
-                    return  $todoModel->getAll();
-                },
-            ],
+             'todos' => [
+                 'type' => Types::result(Types::list(Types::todo())),
+                 'resolve' => static function (): array {
+                     $todoModel = new TodoModel();
+                     $result = $todoModel->getAll();
+                     if (empty($result)) {
+                         return ['message' => 'Todos not found', 'code' => 'NOT_FOUND'];
+                     } else {
+                         return ['list' => $result]; 
+                     }
+                 },
+             ],
             'todo' => [
                 'type' => Types::result(Types::todo()),
                 'args' => ['id' => Type::nonNull(Type::int())],
