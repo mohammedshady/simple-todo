@@ -16,7 +16,7 @@ class UserQuery {
                     if (empty($result)) {
                         return ['message' => 'Users not found', 'code' => 'NOT_FOUND'];
                     } else {
-                        return ['list' => $result]; 
+                        return ['list'=> $result]; 
                     }
                 },
             ],
