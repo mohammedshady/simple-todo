@@ -1,12 +1,16 @@
 <?php
+
 namespace App\Schema\User;
 
 use App\Model\UserModel;
+use App\Repository\UserRepository;
 use GraphQL\Type\Definition\Type;
 use App\Schema\Types;
 
-class UserMutation {
-    public static function fields() {
+class UserMutation
+{
+    public static function fields()
+    {
         return [
             'addUser' => [
                 'type' => Types::user(),
@@ -14,13 +18,14 @@ class UserMutation {
                     'username' => Type::nonNull(Type::string()),
                     'email' => Type::nonNull(Type::string()),
                 ],
-                'resolve' => static function ($root, array $args): ?array {
-                    $userModel = new UserModel();
-                    $result = $userModel->create([
+                'resolve' => static function ($root, array $args): ?UserModel {
+                    $userRepository = new UserRepository();
+                    $user = new UserModel([
                         'username' => $args['username'],
                         'email' => $args['email']
                     ]);
-                    return $result ? $userModel->getById($userModel->getLastInsertId()) : null;
+                    $id = $userRepository->create($user);
+                    return $userRepository->getById($id);
                 },
             ],
             'deleteUser' => [
@@ -29,8 +34,8 @@ class UserMutation {
                     'id' => Type::nonNull(Type::int()),
                 ],
                 'resolve' => static function ($root, array $args): bool {
-                    $userModel = new UserModel();
-                    return $userModel->delete($args['id']);
+                    $userRepository = new UserRepository();
+                    return $userRepository->delete($args['id']);
                 },
             ],
             'updateUser' => [
@@ -40,17 +45,15 @@ class UserMutation {
                     'username' => Type::nonNull(Type::string()),
                     'email' => Type::nonNull(Type::string()),
                 ],
-                'resolve' => static function ($root, array $args): array {
-                    $userModel = new UserModel();
-                    $result = $userModel->update([
+                'resolve' => static function ($root, array $args): ?UserModel {
+                    $userRepository = new UserRepository();
+                    $user = new UserModel([
                         'id' => $args['id'],
                         'username' => $args['username'],
                         'email' => $args['email']
                     ]);
-                    if ($result) {
-                        return $userModel->getById($args['id']);
-                    }
-                    return null;
+                    $result = $userRepository->update($user);
+                    return $result ? $userRepository->getById($args['id']) : null;
                 },
             ],
         ];

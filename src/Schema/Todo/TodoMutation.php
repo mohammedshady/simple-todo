@@ -1,12 +1,16 @@
 <?php
+
 namespace App\Schema\Todo;
 
 use App\Model\TodoModel;
+use App\Repository\TodoRepository;
 use GraphQL\Type\Definition\Type;
 use App\Schema\Types;
 
-class TodoMutation {
-    public static function fields() {
+class TodoMutation
+{
+    public static function fields()
+    {
         return [
             'addTodo' => [
                 'type' => Types::todo(),
@@ -14,13 +18,14 @@ class TodoMutation {
                     'title' => Type::nonNull(Type::string()),
                     'completed' => Type::boolean(),
                 ],
-                'resolve' => static function ($root, array $args): ?array {
-                    $todoModel = new TodoModel();
-                    $result = $todoModel->create([
+                'resolve' => static function ($root, array $args): ?TodoModel {
+                    $todoRepository = new TodoRepository();
+                    $todo = new TodoModel([
                         'title' => $args['title'],
                         'completed' => $args['completed'] ?? false
                     ]);
-                    return $result ? $todoModel->getById($todoModel->getLastInsertId()) : null;
+                    $id = $todoRepository->create($todo);
+                    return $todoRepository->getById($id);
                 },
             ],
             'updateTodo' => [
@@ -30,17 +35,15 @@ class TodoMutation {
                     'title' => Type::nonNull(Type::string()),
                     'completed' => Type::nonNull(Type::boolean()),
                 ],
-                'resolve' => static function ($root, array $args): ?array {
-                    $todoModel = new TodoModel();
-                    $result = $todoModel->update([
+                'resolve' => static function ($root, array $args): ?TodoModel {
+                    $todoRepository = new TodoRepository();
+                    $todo = new TodoModel([
                         'id' => $args['id'],
                         'title' => $args['title'],
                         'completed' => $args['completed']
                     ]);
-                    if ($result) {
-                        return $todoModel->getById($args['id']);
-                    }
-                    return null;
+                    $result = $todoRepository->update($todo);
+                    return $result ? $todoRepository->getById($args['id']) : null;
                 },
             ],
             'deleteTodo' => [
@@ -49,8 +52,8 @@ class TodoMutation {
                     'id' => Type::nonNull(Type::int()),
                 ],
                 'resolve' => static function ($root, array $args): bool {
-                    $todoModel = new TodoModel();
-                    return $todoModel->delete($args['id']);
+                    $todoRepository = new TodoRepository();
+                    return $todoRepository->delete($args['id']);
                 },
             ],
         ];
